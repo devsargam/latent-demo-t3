@@ -26,6 +26,23 @@ model Post {
     @@index([name])
 }
 
+model Show {
+    id          Int       @id @default(autoincrement())
+    title       String
+    description String
+    thumbnail   String
+    showTime    DateTime?
+    ticketPrice Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+
+    @@index([title])
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -63,6 +80,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    shows         Show[]
 }
 
 model VerificationToken {

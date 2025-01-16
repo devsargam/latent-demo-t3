@@ -2,30 +2,26 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
+import { createShowZodSchema } from "~/common/zod/create-show.zod";
 
 import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-
-const formSchema = z.object({
-  title: z.string().min(5),
-  description: z.string().min(20),
-  thumbnail: z.string(),
-  date: z.date(),
-});
+import { api } from "~/trpc/react";
 
 export default function CreateShowForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { mutateAsync, error } = api.show.create.useMutation();
+
+  const form = useForm<z.infer<typeof createShowZodSchema>>({
+    resolver: zodResolver(createShowZodSchema),
     defaultValues: {
       date: new Date(),
       description: "",
@@ -34,10 +30,13 @@ export default function CreateShowForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof createShowZodSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    form.reset();
     console.log(values);
+    const out = await mutateAsync(values);
+    console.log(out);
   }
 
   return (
